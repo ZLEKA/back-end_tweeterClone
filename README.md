@@ -1,7 +1,11 @@
-# MVC Application
+# MVC
+
+A custom PHP 7 application.
 
 ---
-* [How does it work ?](#orm)
+
+* [Important Remarks](#important-remarks)
+* [How does it work ?](#hdiw)
     * [Routes](#routes)
         * [White card](#white-card)
     * [Response](#response)
@@ -17,17 +21,29 @@
         * [Relationships](#relationship)
   * [Database Schema](#db-schema)
 
-## Important Remarks
+## <a name="important-remarks">Important Remarks</a>
+
+### Vagrantfile
+
+The current `Vagrantfile` have the [ncaro/php7-debian8-apache-nginx-mysql](#https://app.vagrantup.com/ncaro/boxes/php7-debian8-apache-nginx-mysql) box.
 
 ### Web Server
 
-The Web Server must be configured to route every request to `index.php` file present in the root folder.
+The Web Server must be configured to route every request to `index.php` file present in the root `code` folder. If you are using the `Vagrantfile` here the `nginx` sample:
+```txt
+location / {
+    # Route all the URIs to index.php
+    try_files /index.php?$args $uri /index.php?$args;
+    ...
+}
+```
+
 
 ## How do I start the application?
 
 The application will start once the file `app.php` is included.
 
-## How does it work?
+## <a name="hdiw">How does it work ?</a>
 
 ### <a name="routes">Routes</a>
 
