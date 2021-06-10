@@ -25,7 +25,7 @@ A custom PHP 7 application.
 
 ### Vagrantfile
 
-The current `Vagrantfile` have the [ncaro/php7-debian8-apache-nginx-mysql](#https://app.vagrantup.com/ncaro/boxes/php7-debian8-apache-nginx-mysql) box.
+The current `Vagrantfile` have the [ncaro/php7-debian8-apache-nginx-mysql](https://app.vagrantup.com/ncaro/boxes/php7-debian8-apache-nginx-mysql) box.
 
 ### Web Server
 
