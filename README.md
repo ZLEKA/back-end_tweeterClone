@@ -5,6 +5,7 @@ A custom PHP 7 application.
 ---
 
 * [Important Remarks](#important-remarks)
+* [How do I start the application?](#start)
 * [How does it work ?](#hdiw)
     * [Routes](#routes)
         * [White card](#white-card)
@@ -37,9 +38,21 @@ location / {
     ...
 }
 ```
+### Database
 
+In order to use the `MySQL` database, you must change the root password.
 
-## How do I start the application?
+```sql
+SET PASSWORD = PASSWORD('xxxxxxxx');
+```
+
+Since the application will search fot a database called `app`, you must create one.
+
+```sql
+CREATE DATABASE app;
+```
+
+## <a name="start">How do I start the application?</a>
 
 The application will start once the file `app.php` is included.
 
@@ -445,8 +458,6 @@ Author::delete('name', '=', 'John');
 ### <a name="db-schema">Database Schema</a>
 
 ```MySQL
-CREATE DATABASE twitter_clone;
-
 CREATE TABLE tweet (
    id INT(8) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
    content VARCHAR(280) NOT NULL,
