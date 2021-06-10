@@ -15,5 +15,5 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "code", "/var/www/html/code"
 
   config.vm.provision "shell", inline: "sudo apt-get update"
-  config.vm.provision "shell", inline: "sudo service php5-fpm stop && sudo service php7-fpm restart"
+  config.vm.provision "shell", inline: "sudo service php5-fpm stop && sudo service php7-fpm stop && sudo service php7-fpm start",run:'always'
 end
