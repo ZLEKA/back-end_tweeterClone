@@ -1,6 +1,6 @@
 # MVC
 
-A custom PHP 7 application.
+A custom PHP 7 application created side-by-side with [Lambert Mata](https://github.com/LambertMata)
 
 ---
 
