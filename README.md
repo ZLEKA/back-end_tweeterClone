@@ -1,6 +1,6 @@
 # MVC
 
-A custom PHP 7 application created side-by-side with [Lambert Mata](https://github.com/LambertMata)
+A custom PHP 7 application created side-by-side with [Lambert Mata](https://github.com/LambertMata) in order to help interns become familiar with the MVC design pattern.
 
 ---
 
