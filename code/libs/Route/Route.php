@@ -155,7 +155,7 @@ class Route
      * @param Closure $fn
      */
     private function closure(Closure $fn){
-        call_user_func($fn,$this->params);
+        call_user_func_array($fn,$this->params);
     }
 
     /**
