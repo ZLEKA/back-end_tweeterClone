@@ -105,7 +105,14 @@ class Route
             return $this->addParam($v); /*Save the params in found order for white card token*/
         },ARRAY_FILTER_USE_BOTH );
 
-        return count($discoveredTokens)==count($requestedUri); /*The correct number of token has been returned*/
+        /*Migrate from Bitbucket missing check*/
+
+        $tReq = count($requestedUri);
+        $tFound = count($discoveredTokens);
+        $match = $tReq == $tFound;
+
+        return ! $tReq ? $match && $request->uri[0]==$this->uri : $match;
+
     }
     /**
      * Run the Route action.
