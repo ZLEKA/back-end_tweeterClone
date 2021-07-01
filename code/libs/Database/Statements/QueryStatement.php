@@ -45,4 +45,20 @@ class QueryStatement
         return $this;
     }
 
+    public function joinWith(string $table, $col1, $exp, $col2, $joinType)
+    {
+        $joinTypes = array("INNER","RIGHT","LEFT","FULL","CROSS");
+
+        if(in_array($joinType, $joinTypes)){
+
+            if(strcmp($joinType,"CROSS")){
+                $this->clauses .= "CROSS JOIN $table \n";
+            }
+
+            $this->clauses .= "$joinType JOIN $table ON $col1 $exp $table.$col2 \n";
+        }
+
+        return this;
+    }
+
 }

@@ -7,7 +7,11 @@ abstract class Model
     private static $db;
 
     public function hasOne($modelClassName) {
-        if (class_exists($modelClassName)) {
+        spl_autoload_register( function($class) {
+            require __DIR__."/../../app/Models/".Tools::pascal_case_to_snake_case($class) . '.php';
+        });
+
+        if (class_exists($modelClassName, true)) {
             $fnFirst = new ReflectionMethod($modelClassName, 'first');
             $fnGetTableName = new ReflectionMethod($modelClassName, 'getTableName');
             $fkField = $fnGetTableName->invoke(null) . '_id';
@@ -17,7 +21,11 @@ abstract class Model
     }
 
     public function hasMany($modelClassName): array {
-        if (class_exists($modelClassName)) {
+        spl_autoload_register( function($class) {
+            require __DIR__."/../../app/Models/".Tools::pascal_case_to_snake_case($class) . '.php';
+        });
+
+        if (class_exists($modelClassName, true)) {
             $staticMethod = new ReflectionMethod($modelClassName, 'find');
             $fk = self::getTableName() . '_id';
             return $staticMethod->invoke(null, $fk, $this->id);
@@ -87,6 +95,51 @@ abstract class Model
             return self::first('id', $lastId);
         }
         return null;
+    }
+
+    public static function innerJoin($modelClassName, string $col1, string $exp, string $col2){
+        self::checkConnection();
+
+        if(is_null($modelClassName)) return null;
+
+        return self::$db->selectFrom(self::getTableName())
+            ->joinWith($modelClassName::getTableName(), $col1, $exp, $col2,"INNER");
+    }
+
+    public static function rightJoin($modelClassName, string $col1, string $exp, string $col2){
+        self::checkConnection();
+
+        if(is_null($modelClassName)) return null;
+
+        return self::$db->selectFrom(self::getTableName())
+            ->joinWith($modelClassName::getTableName(), $col1, $exp, $col2,"RIGHT");
+    }
+
+    public static function leftJoin($modelClassName, string $col1, string $exp, string $col2){
+        self::checkConnection();
+
+        if(is_null($modelClassName)) return null;
+
+        return self::$db->selectFrom(self::getTableName())
+            ->joinWith($modelClassName::getTableName(), $col1j, $expj, $col2j,"LEFT");
+    }
+
+    public static function fullJoin($modelClassName, string $col1, string $exp, string $col2){
+        self::checkConnection();
+
+        if(is_null($modelClassName)) return null;
+
+        return self::$db->selectFrom(self::getTableName())
+            ->joinWith($modelClassName::getTableName(), $col1, $exp, $col2, "FULL");
+    }
+
+    public static function crossJoin($modelClassName){
+        self::checkConnection();
+
+        if(is_null($modelClassName)) return null;
+
+        return self::$db->selectFrom(self::getTableName())
+            ->joinWith($modelClassName::getTableName(), "", "", "", "CROSS");
     }
 
     public static function getTableName() {

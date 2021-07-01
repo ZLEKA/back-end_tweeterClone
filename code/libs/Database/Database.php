@@ -73,5 +73,5 @@ class Database {
         $query = "SELECT $qCols \nFROM $table";
         return new SelectStatement($this->pdo, $query);
     }
-
+    
 }
