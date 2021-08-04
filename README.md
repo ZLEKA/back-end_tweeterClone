@@ -33,8 +33,17 @@ The current `Vagrantfile` have the [ncaro/php7-debian8-apache-nginx-mysql](https
 The Web Server must be configured to route every request to `index.php` file present in the root `code` folder. If you are using the `Vagrantfile` here the `nginx` sample:
 ```txt
 location / {
-    # Route all the URIs to index.php
-    try_files /index.php?$args $uri /index.php?$args;
+   # Route all the URIs to index.php
+   try_files /index.php?$args $uri /index.php?$args;
+   # Avoid file caching for Development.
+   sendfile off;
+   add_header Last-Modified $date_gmt;
+   add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
+   if_modified_since off;
+   expires off;
+   etag off;
+   proxy_no_cache 1;
+   proxy_cache_bypass 1;
     ...
 }
 ```
