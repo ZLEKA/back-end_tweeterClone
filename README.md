@@ -394,6 +394,54 @@ public static function create(array $data)
 Todo::create(['title' => 'My title']);
 ```
 
+```Php
+/** 
+ * Select from table
+ * @returns Statement Select Statement
+ */
+public static function select(array $columns=[])
+```
+
+```Php
+/*E.g.*/
+Todo::select()->get()
+```
+
+```Php
+/**
+* Inner join example
+*/
+Article::select(['author.id', 'article.id'])->innerJoin(Author::class,"author_id","=","id")->get();
+```
+
+```Php
+/**
+* Cross join example
+*/
+Article::select(['author.id', 'article.id'])->crossJoin(Author::class,"author_id","=","id")->get();
+```
+
+```Php
+/**
+* Left join example
+*/
+Article::select(['author.id', 'article.id'])->leftJoin(Author::class,"author_id","=","id")->get();
+```
+
+```Php
+/**
+* Right join example
+*/
+Article::select(['author.id', 'article.id'])->rightJoin(Author::class,"author_id","=","id")->get();
+```
+
+```Php
+/**
+* Full join example
+*/
+Article::select(['author.id', 'article.id'])->fullJoin(Author::class,"author_id","=","id")->get();
+```
+
 #### <a name="relationship">Relationship</a>
 
 To enable relationship mapping, create a method to return the entities and use the following methods allow to map the
