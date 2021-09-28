@@ -83,11 +83,7 @@ abstract class Model
         self::checkConnection();
         return self::$db->selectFrom(self::getTableName())
             ->orm(true, get_called_class())
-<<<<<<< HEAD
             ->where($col1, $exp, $col2);
-=======
-            ->andWhere($col1, $exp, $col2);
->>>>>>> 11fe357... Fixed join methods
     }
 
     public static function create(array $data) {
