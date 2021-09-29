@@ -19,12 +19,8 @@ class QueryStatement
         $this->orm = false;
     }
 
-<<<<<<< HEAD
-    public function where($col1, $exp, $col2)
-=======
     # inject a raw "where" clause into your query
     public function whereRaw($str, $and=false)
->>>>>>> d141638... Add WHERE queries and AND queries
     {
         if($and)
             $this->clauses .= "AND $str\n";
@@ -63,8 +59,6 @@ class QueryStatement
         return $this;
     }
 
-<<<<<<< HEAD
-=======
     public function whereNotBetween($col, $value1, $value2, $and=false)
     {
         if($and)
@@ -174,7 +168,6 @@ class QueryStatement
         }
     }
 
->>>>>>> d141638... Add WHERE queries and AND queries
     public function withOrm() {
         return $this->orm && $this->classMap != null;
     }
