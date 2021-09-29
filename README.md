@@ -565,6 +565,10 @@ Todo::select()->get()
 * Inner join
 * @returns Statement Query Statement using the Model table
 */
+public function innerJoin($modelClassName, string $col1, string $exp, string $col2, $and=false)
+```
+```Php
+/*E.g.*/
 Article::select(['author.id', 'article.id'])->innerJoin(Author::class,"author_id","=","id")->get();
 ```
 ---
@@ -573,6 +577,10 @@ Article::select(['author.id', 'article.id'])->innerJoin(Author::class,"author_id
 * Cross join
 * @returns Statement Query Statement using the Model table
 */
+public function crossJoin($modelClassName, $and=false)
+```
+```Php
+/*E.g.*/
 Article::select(['author.id', 'article.id'])->crossJoin(Author::class)->get();
 ```
 ---
@@ -581,6 +589,10 @@ Article::select(['author.id', 'article.id'])->crossJoin(Author::class)->get();
 * Left join
 * @returns Statement Query Statement using the Model table
 */
+public function leftJoin($modelClassName, string $col1, string $exp, string $col2, $and=false)
+```
+```Php
+/*E.g.*/
 Article::select(['author.id', 'article.id'])->leftJoin(Author::class,"author_id","=","id")->get();
 ```
 ---
@@ -589,6 +601,10 @@ Article::select(['author.id', 'article.id'])->leftJoin(Author::class,"author_id"
 * Right join
 * @returns Statement Query Statement using the Model table
 */
+public function rightJoin($modelClassName, string $col1, string $exp, string $col2, $and=false)
+```
+```Php
+/*E.g.*/
 Article::select(['author.id', 'article.id'])->rightJoin(Author::class,"author_id","=","id")->get();
 ```
 ---
@@ -596,6 +612,10 @@ Article::select(['author.id', 'article.id'])->rightJoin(Author::class,"author_id
 /**
 * Full join example
 */
+public function fullJoin($modelClassName, string $col1, string $exp, string $col2, $and=false)
+```
+```Php
+/*E.g.*/
 Article::select(['author.id', 'article.id'])->fullJoin(Author::class,"author_id","=","id")->get();
 ```
 
