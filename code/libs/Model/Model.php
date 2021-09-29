@@ -86,6 +86,80 @@ abstract class Model
             ->where($col1, $exp, $col2);
     }
 
+    public static function whereRaw($str) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereRaw($str);
+    }
+
+    public static function whereIn($col, $values) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereIn($col, $values);
+    }
+
+    public static function whereNotIn($col, $values) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereNotIn($col, $values);
+    }
+
+    public static function whereBetween($col, $values) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereBetween($col, $value1, $value2);
+    }
+
+    public static function whereNotBetween($col, $values) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereNotBetween($col, $value1, $value2);
+    }
+
+    public static function whereNull($col) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereNull($col);
+    }
+
+    public static function whereNotNull($col) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereNotNull($col);
+    }
+
+    /**
+     * Overloading method whereColumn
+     */
+    public static function whereColumn() {
+        self::checkConnection();
+
+        $args = func_get_args();
+        switch(count($args)){
+            case 1:
+                return self::$db->selectFrom(self::getTableName())
+                    ->orm(true, get_called_class())
+                    ->whereColumn($args[0]);
+            case 2:
+                return self::$db->selectFrom(self::getTableName())
+                    ->orm(true, get_called_class())
+                    ->whereColumn($args[0], $args[1]);
+            case 3:
+                return self::$db->selectFrom(self::getTableName())
+                    ->orm(true, get_called_class())
+                    ->whereColumn($args[0], $args[1], $args[2]);
+        }
+
+        return null;
+    }
+
     public static function create(array $data) {
         self::checkConnection();
         $lastId = self::$db->insertInto(self::getTableName(), $data)

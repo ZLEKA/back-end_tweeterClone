@@ -1,5 +1,11 @@
 <?php
 
+const CROSS ='CROSS';
+const FULL  ='FULL';
+const RIGHT ='RIGHT';
+const LEFT  ='LEFT';
+CONST INNER ='INNER';
+
 class QueryStatement
 {
 
@@ -68,23 +74,23 @@ class QueryStatement
         return $this;
     }
 
-    public function whereIn($col, $array, $and=false)
+    public function whereIn($col, $values, $and=false)
     {
-        $array_to_str = implode(',', $array);
+        $values_to_str = implode(',', $values);
         if($and)
-            $this->clauses .= "AND $col IN ($array_to_str)\n";
+            $this->clauses .= "AND $col IN ($values_to_str)\n";
         else
-            $this->clauses .= "WHERE $col IN ($array_to_str)\n";
+            $this->clauses .= "WHERE $col IN ($values_to_str)\n";
         return $this;
     }
 
-    public function whereNotIn($col, $array, $and=false)
+    public function whereNotIn($col, $values, $and=false)
     {
-        $array_to_str = implode(',', $array);
+        $values_to_str = implode(',', $values);
         if($and)
-            $this->clauses .= "AND $col NOT IN ($array_to_str)\n";
+            $this->clauses .= "AND $col NOT IN ($values_to_str)\n";
         else
-            $this->clauses .= "WHERE $col NOT IN ($array_to_str)\n";
+            $this->clauses .= "WHERE $col NOT IN ($values_to_str)\n";
         return $this;
     }
 
@@ -109,63 +115,61 @@ class QueryStatement
     /**
      * Overloading method whereColumn
      */
-    function __call($name_of_function, $arguments) {
-              
-        // It will match the function name
-        if($name_of_function == 'whereColumn') {
-              
-            switch (count($arguments)) {
+    public function whereColumn() {
+        $args = func_get_args();
+        
+        switch (count($args)) {
                       
-                // If there is only one argument
-                // array of conditions
-                case 1:
-                    if(!isset($arguments[0]) || !is_array($arguments[0]))
+            // If there is only one argument
+            // array of conditions
+            case 1:
+                if(!isset($args[0]) || !is_array($args[0]))
+                    break;
+                    
+                $count = 0;
+                foreach($args[0] as $exp){
+
+                    if(count($exp)!=3)
                         break;
 
-                    $count = 0;
-                    foreach($arguments[0] as $exp){
+                    if($count==0)
+                        $this->clauses .= "WHERE $exp[0] $exp[1] $exp[2]\n";
+                    else
+                        $this->clauses .= "AND $exp[0] $exp[1] $exp[2]\n";
 
-                        if(count($exp)!=3)
-                            break;
+                    $count = -1;
+                }
+                break;
 
-                        if($count==0)
-                            $this->clauses .= "WHERE $exp[0] $exp[1] $exp[2]\n";
-                        else
-                            $this->clauses .= "AND $exp[0] $exp[1] $exp[2]\n";
+            // If two arguments equality check between two columns
+            case 2:
+                if(
+                    !isset($args[0]) || 
+                    !isset($args[1]) || 
+                    !is_string($args[0]) || 
+                    !is_string($args[1])
+                ) break;
 
-                        $count = -1;
-                    }
-                    break;
+                $this->clauses .= "WHERE $args[0] = $args[1]\n";
+                break;
+                        
+            // If three arguments classical exp like a > b
+            case 3:
+                if(
+                    !isset($args[0]) || 
+                    !isset($args[1]) ||
+                    !isset($args[2]) || 
+                    !is_string($args[0]) || 
+                    !is_string($args[1]) ||
+                    !is_string($args[2]) 
+                ) break;
 
-                // If two arguments equality check between two columns
-                case 2:
-                    if(
-                        !isset($arguments[0]) || 
-                        !isset($arguments[1]) || 
-                        !is_string($arguments[0]) || 
-                        !is_string($arguments[1])
-                    ) break;
-
-                    $this->clauses .= "WHERE $arguments[0] = $arguments[1]\n";
-                    break;
-                          
-                // If three arguments classical exp like a > b
-                case 3:
-                    if(
-                        !isset($arguments[0]) || 
-                        !isset($arguments[1]) ||
-                        !isset($arguments[2]) || 
-                        !is_string($arguments[0]) || 
-                        !is_string($arguments[1]) ||
-                        !is_string($arguments[2]) 
-                    ) break;
-
-                    $this->clauses .= "WHERE $arguments[0] $arguments[1] $arguments[2]\n";
-                    break;
-            }
-
-            return $this;
+                $this->clauses .= "WHERE $args[0] $args[1] $args[2]\n";
+                break;
         }
+
+        return $this;
+        
     }
 
     public function withOrm() {
@@ -181,28 +185,28 @@ class QueryStatement
     }
 
     public function innerJoin($modelClassName, string $col1, string $exp, string $col2, $and=false){
-        return $this->joinWith($modelClassName::getTableName(), $col1, $exp, $col2,'INNER', $and);
+        return $this->joinWith($modelClassName::getTableName(), $col1, $exp, $col2,INNER, $and);
     }
 
     public function rightJoin($modelClassName, string $col1, string $exp, string $col2, $and=false){
-        return $this->joinWith($modelClassName::getTableName(), $col1, $exp, $col2,'RIGHT', $and);
+        return $this->joinWith($modelClassName::getTableName(), $col1, $exp, $col2,RIGHT, $and);
     }
 
     public function leftJoin($modelClassName, string $col1, string $exp, string $col2, $and=false){
-        return $this->joinWith($modelClassName::getTableName(), $col1j, $expj, $col2j,'LEFT', $and);
+        return $this->joinWith($modelClassName::getTableName(), $col1j, $expj, $col2j,LEFT, $and);
     }
 
     public function fullJoin($modelClassName, string $col1, string $exp, string $col2, $and=false){
-        return $this->joinWith($modelClassName::getTableName(), $col1, $exp, $col2, 'FULL', $and);
+        return $this->joinWith($modelClassName::getTableName(), $col1, $exp, $col2, FULL, $and);
     }
 
     public function crossJoin($modelClassName, $and=false){
-        return $this->joinWith($modelClassName::getTableName(), null, null, null, 'CROSS', $and);
+        return $this->joinWith($modelClassName::getTableName(), null, null, null, CROSS, $and);
     }
 
     private function joinWith(string $table, $col1, $exp, $col2, $joinType, $and=false)
     {
-        $joinTypes = array('INNER','RIGHT','LEFT','FULL','CROSS');
+        $joinTypes = array(INNER, RIGHT, LEFT, FULL, CROSS);
 
         if(in_array($joinType, $joinTypes)){
             if($and)
@@ -210,7 +214,7 @@ class QueryStatement
 
             $this->clauses .= "$joinType JOIN $table ";
 
-            if($joinType!=='CROSS')
+            if($joinType!==CROSS)
                 $this->clauses .= "ON $col1 $exp $table.$col2 \n";
         }
 
