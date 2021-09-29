@@ -112,8 +112,9 @@ class Route
         /*Migrate from Bitbucket missing check*/
 
         $tReq = count($requestedUri);
+        $tDef = count($definedUri);
         $tFound = count($discoveredTokens);
-        $match = $tReq == $tFound;
+        $match = ($tReq == $tFound && $tReq == $tDef && $tFound == $tDef);
 
         return ! $tReq ? $match && $request->uri[0]==$this->uri : $match;
 
