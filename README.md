@@ -19,6 +19,8 @@ A custom PHP 7 application created side-by-side with [Lambert Mata](https://gith
             * [Caveats](#caveats)
         * [Model](#model)
             * [Static Methods](#static)
+            * [Join Methods](#join)
+            * [Multiple WHERE Clauses](#where)
         * [Relationships](#relationship)
   * [Database Schema](#db-schema)
 
@@ -376,7 +378,154 @@ public static function where($col1, $exp, $col2)
 
 ```Php
 /*E.g.*/
-Todo::where('title', 'My title')->get()
+Todo::where('title', '=', 'My title')->get()
+```
+
+---
+
+```Php
+/** 
+ * The whereRaw method can be used to inject a raw "where" clause into your query.
+ * @returns Statement Query Statement using the Model table
+ */
+public static function whereRaw($str)
+```
+
+```Php
+/*E.g.*/
+Todo::whereRaw("title = 'My title'")->get()
+```
+
+---
+
+```Php
+/** 
+ * The whereIn method verifies that a given column's value is contained within the given array
+ * @returns Statement Query Statement using the Model table
+ */
+public static function whereIn($col, $values)
+```
+
+```Php
+/*E.g.*/
+Todo::whereIn('id', [1,2,3])->get()
+```
+
+---
+
+```Php
+/** 
+ * The whereNotIn method verifies that the given column's value is not contained in the given array
+ * @returns Statement Query Statement using the Model table
+ */
+public static function whereNotIn($col, $values)
+```
+
+```Php
+/*E.g.*/
+Todo::whereNotIn('id', [1,2,3])->get()
+```
+
+---
+
+```Php
+/** 
+ * The whereNull method verifies that the value of the given column is NULL
+ * @returns Statement Query Statement using the Model table
+ */
+public static function whereNull($col)
+```
+
+```Php
+/*E.g.*/
+Todo::whereNull('updated_at')->get()
+```
+
+---
+
+```Php
+/** 
+ * The whereNotNull method verifies that the column's value is not NULL
+ * @returns Statement Query Statement using the Model table
+ */
+public static function whereNotNull($col)
+```
+
+```Php
+/*E.g.*/
+Todo::whereNotNull('updated_at')->get()
+```
+
+---
+
+```Php
+/** 
+ * The whereBetween method verifies that a column's value is between two values
+ * @returns Statement Query Statement using the Model table
+ */
+public static function whereBetween($col, $value1, $value2)
+```
+
+```Php
+/*E.g.*/
+Todo::whereBetween('day', 1, 5)->get()
+```
+
+---
+
+```Php
+/** 
+ * The whereBetween method verifies that a column's value is not between two values
+ * @returns Statement Query Statement using the Model table
+ */
+public static function whereNotBetween($col, $value1, $value2)
+```
+
+```Php
+/*E.g.*/
+Todo::whereNotBetween('day', 1, 5)->get()
+```
+
+---
+
+```Php
+/** 
+ * The whereColumn method may be used to verify that two columns are equal
+ * @returns Statement Query Statement using the Model table
+ */
+public static function whereColumn($col, $value1, $value2)
+```
+
+```Php
+/*E.g.*/
+Todo::whereColumn('first_name', 'last_name')->get()
+```
+
+
+```Php
+/** 
+ * You may also pass a comparison operator to the whereColumn method
+ */
+```
+
+```Php
+/*E.g.*/
+Todo::whereColumn('updated_at', '>', 'created_at')->get()
+```
+
+```Php
+/** 
+ * You may also pass an array of column comparisons to the whereColumn method. 
+ * These conditions will be joined using the 'and' operator.
+ */
+```
+
+```Php
+/*E.g.*/
+Todo::whereColumn([
+        ['first_name', '=', 'last_name'],
+        ['updated_at', '>', 'created_at'],
+    ])->get()
 ```
 
 ---
@@ -394,9 +543,11 @@ public static function create(array $data)
 Todo::create(['title' => 'My title']);
 ```
 
+---
+
 ```Php
 /** 
- * Select from table
+ * Select columns from table (if $columns array is empty select automatically all the columns)
  * @returns Statement Select Statement
  */
 public static function select(array $columns=[])
@@ -407,40 +558,95 @@ public static function select(array $columns=[])
 Todo::select()->get()
 ```
 
+### <a name="join">Join Methods</a>
+
 ```Php
 /**
-* Inner join example
+* Inner join
+* @returns Statement Query Statement using the Model table
 */
+public function innerJoin($modelClassName, string $col1, string $exp, string $col2, $and=false)
+```
+```Php
+/*E.g.*/
 Article::select(['author.id', 'article.id'])->innerJoin(Author::class,"author_id","=","id")->get();
 ```
-
+---
 ```Php
 /**
-* Cross join example
+* Cross join
+* @returns Statement Query Statement using the Model table
 */
-Article::select(['author.id', 'article.id'])->crossJoin(Author::class,"author_id","=","id")->get();
+public function crossJoin($modelClassName, $and=false)
 ```
-
+```Php
+/*E.g.*/
+Article::select(['author.id', 'article.id'])->crossJoin(Author::class)->get();
+```
+---
 ```Php
 /**
-* Left join example
+* Left join
+* @returns Statement Query Statement using the Model table
 */
+public function leftJoin($modelClassName, string $col1, string $exp, string $col2, $and=false)
+```
+```Php
+/*E.g.*/
 Article::select(['author.id', 'article.id'])->leftJoin(Author::class,"author_id","=","id")->get();
 ```
-
+---
 ```Php
 /**
-* Right join example
+* Right join
+* @returns Statement Query Statement using the Model table
 */
+public function rightJoin($modelClassName, string $col1, string $exp, string $col2, $and=false)
+```
+```Php
+/*E.g.*/
 Article::select(['author.id', 'article.id'])->rightJoin(Author::class,"author_id","=","id")->get();
 ```
-
+---
 ```Php
 /**
 * Full join example
 */
+public function fullJoin($modelClassName, string $col1, string $exp, string $col2, $and=false)
+```
+```Php
+/*E.g.*/
 Article::select(['author.id', 'article.id'])->fullJoin(Author::class,"author_id","=","id")->get();
 ```
+
+### <a name="where">Multiple WHERE Clauses</a>
+```Php
+/**
+* Make attention ALL not static where methods has one more parameter $and to use AND operator
+* public function where($col1, $exp, $col2, $and=false)
+* public function whereRaw($str, $and=false)
+* public function whereIn($col, $values, $and=false)
+* public function whereNotIn($col, $values, $and=false)
+* public function whereNull($col, $and=false)
+* public function whereNotNull($col, $and=false)
+* public function whereBetween($col, $value1, $value2, $and=false)
+* public function whereNotBetween($col, $value1, $value2, $and=false)
+*/
+Todo::where('title','=','MyTitle')->where('genre', '=', 'mystery', true)->get();
+```
+---
+```Php
+/**
+* To use multiple where clauses with OR operator
+* public function orWhere($col1, $exp, $col2)
+* public function orWhereRaw($str)
+*/
+Todo::where('title','=','MyTitle')->orWhere('genre', '=', 'mystery')->get();
+
+Todo::where('title','=','MyTitle')->orWhereRaw("genre = 'mystery'")->get();
+```
+
+
 
 #### <a name="relationship">Relationship</a>
 
