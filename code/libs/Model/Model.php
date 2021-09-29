@@ -107,14 +107,14 @@ abstract class Model
             ->whereNotIn($col, $values);
     }
 
-    public static function whereBetween($col, $values) {
+    public static function whereBetween($col, $value1, $value2) {
         self::checkConnection();
         return self::$db->selectFrom(self::getTableName())
             ->orm(true, get_called_class())
             ->whereBetween($col, $value1, $value2);
     }
 
-    public static function whereNotBetween($col, $values) {
+    public static function whereNotBetween($col, $value1, $value2) {
         self::checkConnection();
         return self::$db->selectFrom(self::getTableName())
             ->orm(true, get_called_class())
