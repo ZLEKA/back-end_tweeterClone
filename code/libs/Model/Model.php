@@ -7,7 +7,11 @@ abstract class Model
     private static $db;
 
     public function hasOne($modelClassName) {
-        if (class_exists($modelClassName)) {
+        spl_autoload_register( function($class) {
+            require __DIR__."/../../app/Models/".Tools::pascal_case_to_snake_case($class) . '.php';
+        });
+
+        if (class_exists($modelClassName, true)) {
             $fnFirst = new ReflectionMethod($modelClassName, 'first');
             $fnGetTableName = new ReflectionMethod($modelClassName, 'getTableName');
             $fkField = $fnGetTableName->invoke(null) . '_id';
@@ -17,7 +21,11 @@ abstract class Model
     }
 
     public function hasMany($modelClassName): array {
-        if (class_exists($modelClassName)) {
+        spl_autoload_register( function($class) {
+            require __DIR__."/../../app/Models/".Tools::pascal_case_to_snake_case($class) . '.php';
+        });
+
+        if (class_exists($modelClassName, true)) {
             $staticMethod = new ReflectionMethod($modelClassName, 'find');
             $fk = self::getTableName() . '_id';
             return $staticMethod->invoke(null, $fk, $this->id);
@@ -78,6 +86,80 @@ abstract class Model
             ->where($col1, $exp, $col2);
     }
 
+    public static function whereRaw($str) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereRaw($str);
+    }
+
+    public static function whereIn($col, $values) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereIn($col, $values);
+    }
+
+    public static function whereNotIn($col, $values) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereNotIn($col, $values);
+    }
+
+    public static function whereBetween($col, $value1, $value2) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereBetween($col, $value1, $value2);
+    }
+
+    public static function whereNotBetween($col, $value1, $value2) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereNotBetween($col, $value1, $value2);
+    }
+
+    public static function whereNull($col) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereNull($col);
+    }
+
+    public static function whereNotNull($col) {
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName())
+            ->orm(true, get_called_class())
+            ->whereNotNull($col);
+    }
+
+    /**
+     * Overloading method whereColumn
+     */
+    public static function whereColumn() {
+        self::checkConnection();
+
+        $args = func_get_args();
+        switch(count($args)){
+            case 1:
+                return self::$db->selectFrom(self::getTableName())
+                    ->orm(true, get_called_class())
+                    ->whereColumn($args[0]);
+            case 2:
+                return self::$db->selectFrom(self::getTableName())
+                    ->orm(true, get_called_class())
+                    ->whereColumn($args[0], $args[1]);
+            case 3:
+                return self::$db->selectFrom(self::getTableName())
+                    ->orm(true, get_called_class())
+                    ->whereColumn($args[0], $args[1], $args[2]);
+        }
+
+        return null;
+    }
+
     public static function create(array $data) {
         self::checkConnection();
         $lastId = self::$db->insertInto(self::getTableName(), $data)
@@ -87,6 +169,11 @@ abstract class Model
             return self::first('id', $lastId);
         }
         return null;
+    }
+
+    public function select(array $columns = []){
+        self::checkConnection();
+        return self::$db->selectFrom(self::getTableName(), $columns);
     }
 
     public static function getTableName() {

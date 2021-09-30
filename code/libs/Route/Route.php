@@ -98,18 +98,23 @@ class Route
         $definedUri =  self::tokenize($this->uri);
 
         $discoveredTokens = array_filter($requestedUri,function($v,$k) use ($definedUri){
-            if(isset($definedUri[$k])&&$v==$definedUri[$k]) /*Token exists and is the same*/
-                return true;
-            elseif($v!=$definedUri[$k] && !preg_match(URI_REGEX_TOKEN_MATCH,$definedUri[$k])) /*Token is different but does not match the white card syntax*/
+
+            /*Token doesn't exist or is different and doesn't match the white card syntax*/
+            if(!isset($definedUri[$k]) || ($v!=$definedUri[$k] && !preg_match(URI_REGEX_TOKEN_MATCH,$definedUri[$k]))) 
                 return false;
-            return $this->addParam($v); /*Save the params in found order for white card token*/
+
+            if($v==$definedUri[$k]) /*Token exists and is the same*/
+                return true;
+
+            return $this->addParam($v); /*Save the params for white card token*/
         },ARRAY_FILTER_USE_BOTH );
 
         /*Migrate from Bitbucket missing check*/
 
         $tReq = count($requestedUri);
+        $tDef = count($definedUri);
         $tFound = count($discoveredTokens);
-        $match = $tReq == $tFound;
+        $match = ($tReq == $tFound && $tReq == $tDef && $tFound == $tDef);
 
         return ! $tReq ? $match && $request->uri[0]==$this->uri : $match;
 
