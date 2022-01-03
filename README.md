@@ -8,7 +8,7 @@ A custom PHP 7 application created side-by-side with [Lambert Mata](https://gith
 * [How do I start the application?](#start)
 * [How does it work ?](#hdiw)
     * [Routes](#routes)
-        * [White card](#white-card)
+        * [Wild card](#wild-card)
     * [Response](#response)
     * [Request](#request)
         * [Parameter](#parameter)
@@ -113,15 +113,15 @@ Those are the handling implementations in case the `Action` has been declared as
 
 >If one of the routes have been wrongly written, the application should not start.
 
-#### <a name="white-card">White card</a>
-A `Route` can have an infinite amount of white cards in order to facilitate the URI implementation. The white card is created using a mustached syntax `{id}`.
+#### <a name="wild-card">Wild card</a>
+A `Route` can have an infinite amount of wild cards in order to facilitate the URI implementation. The wild card is created using a mustached syntax `{id}`.
 
 ```php
 Router::delete('/user/{id}',['use'=>'UserController@delete']);
 ```
 This declared `Route` will match a `DELETE` request `http://localhost/user/10`.
 
-Each white card will be added as argument to the defined `Closure` or `Controller`.
+Each wild card will be added as argument to the defined `Closure` or `Controller`.
 
 ```php
 Router::delete('/user/{id}',function(Request $request,$id){
