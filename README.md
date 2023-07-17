@@ -1,91 +1,147 @@
-# MVC
+# Web MVC Starter
 
-A custom PHP 7 application created side-by-side with [Lambert Mata](https://github.com/LambertMata) in order to help interns become familiar with the MVC design pattern.
+A PHP 8.2 web application created side-by-side with [Lambert Mata](https://github.com/LambertMata) in order to help interns become familiar with the MVC design pattern.
 
 ---
 
-* [Important Remarks](#important-remarks)
-* [How do I start the application?](#start)
-* [How does it work ?](#hdiw)
-    * [Routes](#routes)
-        * [Wild card](#wild-card)
-    * [Response](#response)
-    * [Request](#request)
-        * [Parameter](#parameter)
-    * [Controller](#controller)
-    * [View](#view)
-    * [ORM](#orm)
-        * [Configuration](#model-config)
-            * [Caveats](#caveats)
-        * [Model](#model)
-            * [Static Methods](#static)
-            * [Join Methods](#join)
-            * [Multiple WHERE Clauses](#where)
-        * [Relationships](#relationship)
-  * [Database Schema](#db-schema)
+- [Web MVC Starter](#web-mvc-starter)
+    - [Requirements](#requirements)
+      - [Linux environment](#linux-environment)
+      - [Docker](#docker)
+    - [Getting started](#getting-started)
+      - [1. Initial MySQL configuration](#1-initial-mysql-configuration)
+      - [2. Start the application with Docker](#2-start-the-application-with-docker)
+    - [Application components](#application-components)
+      - [2. Configure NGINX web server](#2-configure-nginx-web-server)
+      - [4. Start the application with Docker](#4-start-the-application-with-docker)
+    - [Dockerization](#dockerization)
+    - [Web Server](#web-server)
+  - [Project structure](#project-structure)
+    - [Entrypoint](#entrypoint)
+    - [Routes](#routes)
+      - [Wild card](#wild-card)
+    - [Request](#request)
+    - [Parameter](#parameter)
+    - [Controller](#controller)
+    - [Response](#response)
+    - [View](#view)
+    - [ORM](#orm)
+    - [Model](#model)
+      - [Methods](#methods)
+    - [Static Methods](#static-methods)
+    - [Join Methods](#join-methods)
+    - [Multiple WHERE Clauses](#multiple-where-clauses)
+      - [Relationship](#relationship)
+      - [Configuration](#configuration)
+    - [Database Schema](#database-schema)
 
-## <a name="important-remarks">Important Remarks</a>
 
-### Vagrantfile
+### Application Requirements
 
-The current `Vagrantfile` have the [ncaro/php7-debian8-apache-nginx-mysql](https://app.vagrantup.com/ncaro/boxes/php7-debian8-apache-nginx-mysql) box.
+#### Linux environment
+Our recommended approach, to work with the project, is to use the Windows Subsystem for Linux [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
 
-### Web Server
+#### Docker
+You can install Docker using [Docker desktop](https://www.docker.com/products/docker-desktop/) which integrates with WSL automatically without any additional set up.
 
-The Web Server must be configured to route every request to `index.php` file present in the root `code` folder. If you are using the `Vagrantfile` here the `nginx` sample:
-```txt
-location / {
-   # Route all the URIs to index.php
-   try_files /index.php?$args $uri /index.php?$args;
-   # Avoid file caching for Development.
-   sendfile off;
-   add_header Last-Modified $date_gmt;
-   add_header Cache-Control 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';
-   if_modified_since off;
-   expires off;
-   etag off;
-   proxy_no_cache 1;
-   proxy_cache_bypass 1;
-    ...
-}
-```
-### Database
+To enable WSL integration flag `Enable integration with my default WSL distro` in `Settings > Resources > WSL Integration`.
 
-In order to use the `MySQL` database, you must change the root password.
 
-```sql
-SET PASSWORD = PASSWORD('xxxxxxxx');
-```
+### Getting started
+#### 1. Initial MySQL configuration
+The first time the mysql container is started it will create a database and credentials that can be changed in `./docker/mysql/.env`. The default configuration is:
 
-Since the application will search fot a database called `app`, you must create one.
-
-```sql
-CREATE DATABASE app;
+```shell
+MYSQL_ROOT_PASSWORD=secret
+MYSQL_USER=dev
+MYSQL_PASSWORD=secret
+MYSQL_DATABASE=app
 ```
 
-## <a name="start">How do I start the application?</a>
+#### 2. Start the application with Docker
+The application uses Docker compose to create the infrastructure for development environment. The configuration is defined in ```docker-compose.yml``` and contains the following services:
 
-The application will start once the file `app.php` is included.
+* NGINX
+* PHP-FPM
+* MySQL
 
-## <a name="hdiw">How does it work ?</a>
+On each "development session" MySQL database data is persisted using a volume.
 
-### <a name="routes">Routes</a>
+**Runing the application in detached mode**:
+```shell
+docker compose up -d
+```
+
+**Checking if the application is running correctly using**:
+```shell
+docker ps
+```
+you should see three containers running the services..
+
+**Stopping the application**:
+```shell
+docker compose down
+```
+
+### Application components
+
+#### Configure NGINX web server
+[NGINX](https://nginx.org/en/docs/beginners_guide.html#conf_structure) is already configured to serve php content through PHP-FPM, though you can change the configuration file that is located in `./config/nginx.conf`.
+
+The configuration tells NGINX to route the request to index.php which is interpreted using php-fpm service that is running using port 9000.
+
+#### 4. Start the application with Docker
+
+**Run the application in detached mode**:
+```shell
+docker compose up -d
+```
+Docker compose start the services defined in `docker-compose.yml`: php-fpm, web and db-mysql.
+
+For each service that is defined in the configuration file, a container will be created. MySQL database is persisted using a volume which is created the first time that the docker application is started. Check the documentation for details.
+
+**To check if the application is running correctly using**:
+```shell
+docker ps
+```
+you should see three containers running the three services.
+
+**To stop the application run**:
+```shell
+docker compose down
+```
+
+### Dockerization
+The `docker-compose.yml` is used to create a dev environment with PHP-8.2 FPM, NGINX and MySQL server.
+
+> Notice `./docker/php-fpm/Dockerfile` used to create a php-fpm image in `docker-compose.yml` php-fpm service. This step is necessary to build a php-fpm image that has the required extensions.
+
+## Project structure
+
+### Entrypoint
+
+The application entrypoint is the `app.php` that will bootstrap the PHP application.
+
+### Routes
 
 The application will start reading the file `routes.php`, containing all the available routes with their own `HTTP Verbs`.
 
-Each `route` consist of three things:
+Each `route` consist of three parts:
 
 * `Method`
-    * The method that the route should respond, it can be:`POST,GET,PATCH or DELETE`.
+
+     The method that the route should respond, it can be:`POST,GET,PATCH or DELETE`.
 
 * `URI`
-    * The *Uniform Resource Identifier* that the route should respond, it can be anything separated from `/`.
+    
+    The *Uniform Resource Identifier* that the route should respond, it can be anything separated from `/`.
 
 * `Action`
-    * The Action is what the route must do when called, it can be tree things:
-        * `Closure` PHP Anonymous Function
-        * `String` Simple String
-        * `Array` Must have the association `use` pointing to an existing `Controller` and `method` separated by `@`.
+
+    The Action is what the route must do when called, it can be tree things:
+    * `Closure` PHP Anonymous Function
+    * `String` Simple String
+    * `Array` Must have the association `use` pointing to an existing `Controller` and `method` separated by `@`.
 
 The `Closure` or `Method` will receive as first argument an instance of `Request`.
 
@@ -96,32 +152,34 @@ Router::post('/post/something',function(Request $request){
     /*Code goes here*/
 });
 ```
-When the `Request` object is ready, then the application will execute a `handle` method that will search for the requested `Route`, if there is any. If the Route is found, then the defined `Action`
-will be executed, passing as first parameter the `Request` object.
+When the `Request` object is ready, then the application will execute a `handle` method that will search for the requested `Route`, if there is any. If the Route is found, then the defined `Action` will be executed, passing as first parameter the `Request` object.
 
 Those are the handling implementations in case the `Action` has been declared as:
 
 * `String`
-    *  It should get directly printed.
+
+    It should get directly printed.
 
 * `Closure`
-    *  The Closure should be executed passing as first argument the `Request` object.
+    
+    The Closure should be executed passing as first argument the `Request` object.
 
 * `Array`
-    *  The specified `Method` in the specified `Controller` should be called, passing as first argument the `Request` object.
+    
+    The specified `Method` in the specified `Controller` should be called, passing as first argument the `Request` object.
     
 
 >If one of the routes have been wrongly written, the application should not start.
 
-#### <a name="wild-card">Wild card</a>
-A `Route` can have an infinite amount of wild cards in order to facilitate the URI implementation. The wild card is created using a mustached syntax `{id}`.
+#### Wild card
+A `Route` can have an infinite amount of wild cards in order to facilitate the defining URIs. A wild card is created using mustache syntax `{id}`.
 
 ```php
 Router::delete('/user/{id}',['use'=>'UserController@delete']);
 ```
 This declared `Route` will match a `DELETE` request `http://localhost/user/10`.
 
-Each wild card will be added as argument to the defined `Closure` or `Controller`.
+Each wild card will be injected as argument to the defined `Closure` or `Controller`.
 
 ```php
 Router::delete('/user/{id}',function(Request $request,$id){
@@ -129,13 +187,13 @@ Router::delete('/user/{id}',function(Request $request,$id){
 });
 ```
 
-### <a name="request">Request</a>
+### Request
 
 Once the `routes` have been parsed and validated, the application will capture the incoming request and save all the information in the `Request` instance.
 
-The `Request` instance should contain all the information regarding the incoming request,correctly separated and categorized in `Parameter` instances.
+The `Request` instance contains the information regarding the incoming request, represented with `Parameter` instances.
 
-The `Request` instance will have the following accessible properties.
+The `Request` instance has the following accessible properties.
 
 
 ```Php
@@ -149,7 +207,44 @@ public $cookies; //Cookies ($_COOKIE). | Parameter
 public $headers; //Headers (taken from the $_SERVER). | Parameter
 public $content; //The raw Body data | String
 ```
-### <a name="response">Response</a>
+### Parameter
+
+Each `Parameter` instance will have the following accessible methods:`all`,`keys`,`replace`,`add`,`get`,`set`,`has`,`remove`.
+
+```Php
+public function all(): array //Returns the parameters.
+public function keys(): array //Returns the parameter keys.
+public function replace(array $parameters = array()) //Replaces the current parameters by a new set.
+public function add(array $parameters = array()) //Add parameters.
+public function get(string $key, $default = null) //Returns a parameter by name, or fallback to default.
+public function set(string $key, $value) //Sets a parameter by name.
+public function has(string $key): bool //Returns true if the parameter is defined.
+public function remove(string $key) //Removes a parameter.
+```
+
+```Php
+/* http://localhost/info?beans=10 */
+Router::get('/info',function(Request $request){
+    return $request->query->has('beans') ?
+        json_encode($request->query->get('beans')) : [];   
+});
+```
+### Controller
+
+Route requests are managed by `Controllers`. A `Controller` extend the `Controller` class and should look like this.
+
+```php
+class CustomController extends Controller{
+    public function index(Request $request){ 
+        /*Code goes here*/      
+        return json_encode($request->content);
+    }   
+} 
+```
+
+> A `Controller` that is specified in `routes.php` must exists, otherwise the application will not start.
+
+### Response</a>
 
 If the Controller returns a json or text , you can use the `Response` instance. 
 
@@ -173,44 +268,8 @@ public static function text(string $content='',int $status=self::HTTP_OK)
 public static function code(int $status=self::HTTP_OK)
 ```
 
-### <a name="parameter">Parameter</a>
 
-Each `Parameter` instance will have the following accessible methods:`all`,`keys`,`replace`,`add`,`get`,`set`,`has`,`remove`.
-
-```Php
-public function all(): array //Returns the parameters.
-public function keys(): array //Returns the parameter keys.
-public function replace(array $parameters = array()) //Replaces the current parameters by a new set.
-public function add(array $parameters = array()) //Add parameters.
-public function get(string $key, $default = null) //Returns a parameter by name, or fallback to default.
-public function set(string $key, $value) //Sets a parameter by name.
-public function has(string $key): bool //Returns true if the parameter is defined.
-public function remove(string $key) //Removes a parameter.
-```
-
-```Php
-/* http://localhost/info?beans=10 */
-Router::get('/info',function(Request $request){
-    return $request->query->has('beans') ?
-        json_encode($request->query->get('beans')) : [];   
-});
-```
-### <a name="controller">Controller</a>
-
-A custom `Controller` must be created in order to properly work ,it should look like this.
-
-```php
-class CustomController extends Controller{
-    public function index(Request $request){ 
-        /*Code goes here*/      
-        return json_encode($request->content);
-    }   
-} 
-```
-
->If a `Controller` is specified in the `routes.php` file and not found, the application should not start.
-
-### <a name="view">View</a>
+### View
 
 If the `Controller` returns a Web page, then the `View` class  should be `required` and returned as response with the desired data.
 
@@ -223,7 +282,7 @@ class CustomController extends Controller{
 }
 ```
 
-### <a name="orm">ORM</a>
+### ORM
 
 The abstract `Model` class allows the mapping of Relational Database to Objects without the need to parse data manually.
 
@@ -233,7 +292,7 @@ Subclasses of Model can perform basic `CRUD` operations and access the entity re
 
 The `Model` must support `One to One`, `One to Many` and `Many to Many` relationships.
 
-### <a name="model">Model</a>
+### Model
 
 #### Methods
 ```php
@@ -292,7 +351,7 @@ $todo = Todo::first('id', 1);
 $todo->delete();
 ```
 
-### <a name="static">Static Methods</a>
+### Static Methods
 
 ```Php
 /** Configures the database connection */
@@ -558,7 +617,7 @@ public static function select(array $columns=[])
 Todo::select()->get()
 ```
 
-### <a name="join">Join Methods</a>
+### Join Methods
 
 ```Php
 /**
@@ -619,7 +678,7 @@ public function fullJoin($modelClassName, string $col1, string $exp, string $col
 Article::select(['author.id', 'article.id'])->fullJoin(Author::class,"author_id","=","id")->get();
 ```
 
-### <a name="where">Multiple WHERE Clauses</a>
+### Multiple WHERE Clauses
 ```Php
 /**
 * Make attention ALL not static where methods has one more parameter $and to use AND operator
@@ -648,7 +707,7 @@ Todo::where('title','=','MyTitle')->orWhereRaw("genre = 'mystery'")->get();
 
 
 
-#### <a name="relationship">Relationship</a>
+#### Relationship
 
 To enable relationship mapping, create a method to return the entities and use the following methods allow to map the
 entity relationship to the current instance. The methods take the `className` as parameter.
@@ -673,7 +732,7 @@ class User { //The author articles
 }
 ```
 
-#### <a name="model-config">Configuration</a>
+#### Configuration
 
 Before making any queries it is necessary to setup database configuration using static function ```configConnection```.
 ```Php
@@ -718,7 +777,7 @@ $author->delete();
 Author::delete('name', '=', 'John');
 ```
 
-### <a name="db-schema">Database Schema</a>
+### Database Schema
 
 ```MySQL
 CREATE TABLE tweet (

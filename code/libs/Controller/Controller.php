@@ -50,4 +50,35 @@ class Controller
     }
 
 
+    /**
+     * Writes a rendered view into response
+     * @param string $view
+     * @param array $data
+     * @return View
+     * @throws Exception
+     */
+    public function view(string $view, array $data = []): View {
+        return new View($view, $data);
+    }
+
+    /**
+     * Writes a plain test response
+     * @param string $content
+     * @param int $status
+     * @return void
+     */
+    public function response(string $content, int $status = Response::HTTP_OK): void {
+        Response::text($content, $status);
+    }
+
+    /**
+     * Writes a JSON encoded response
+     * @param array $data
+     * @param int $status
+     * @return void
+     */
+    public function jsonResponse(array $data, int $status = Response::HTTP_OK): void {
+        Response::json($data, $status);
+    }
+
 }
