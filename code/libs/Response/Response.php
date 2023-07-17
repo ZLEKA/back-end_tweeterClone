@@ -30,8 +30,8 @@ class Response
      */
     public static function json($content=[],int $status=self::HTTP_OK,$flags=JSON_FORCE_OBJECT|JSON_NUMERIC_CHECK){
         header(self::JSON_CONTENT);
-        echo json_encode($content,$flags);
         http_response_code($status);
+        echo json_encode($content,$flags);
     }
 
     /**
@@ -41,7 +41,7 @@ class Response
      */
     public static function text(string $content='',int $status=self::HTTP_OK){
         header(self::TEXT_CONTENT);
-        echo $content;
         http_response_code($status);
+        echo $content;
     }
 }
