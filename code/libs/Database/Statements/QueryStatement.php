@@ -38,15 +38,15 @@ class QueryStatement
     public function where($col1, $exp, $col2, $and=false)
     {
         if($and)
-            $this->clauses .= "AND $col1 $exp $col2\n";
+            $this->clauses .= "AND $col1 $exp '$col2'\n";
         else
-            $this->clauses .= "WHERE $col1 $exp $col2\n";
+            $this->clauses .= "WHERE $col1 $exp '$col2'\n";
         return $this;
     }
 
     public function orWhere($col1, $exp, $col2)
     {
-        $this->clauses .= empty($this->clauses) ? "WHERE $col1 $exp $col2\n" : "OR $col1 $exp $col2\n";
+        $this->clauses .= empty($this->clauses) ? "WHERE $col1 $exp '$col2'\n" : "OR $col1 $exp '$col2'\n";
         return $this;
     }
 
@@ -193,7 +193,7 @@ class QueryStatement
     }
 
     public function leftJoin($modelClassName, string $col1, string $exp, string $col2, $and=false){
-        return $this->joinWith($modelClassName::getTableName(), $col1j, $expj, $col2j,LEFT, $and);
+        return $this->joinWith($modelClassName::getTableName(), $col1, $exp, $col2,LEFT, $and);
     }
 
     public function fullJoin($modelClassName, string $col1, string $exp, string $col2, $and=false){
