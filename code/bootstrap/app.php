@@ -33,6 +33,9 @@ try {
     /*Initializing the Router*/
     $route = new Router();
 
+    /** Disable deprecation warnings */
+    error_reporting( E_ALL ^ E_DEPRECATED );
+
     /*Handling the request*/
     $route->handle(
         Request::capture()
