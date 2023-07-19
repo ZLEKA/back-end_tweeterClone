@@ -12,6 +12,8 @@ class Controller
      * @return mixed
      * @throws Exception
      */
+
+    
     public static function make($class): ReflectionClass{
         if (!self::exists($class))
             throw new Exception(ERROR_CONTROLLER_NOT_FOUND);

@@ -5,7 +5,11 @@ class Response
     const HTTP_CREATED = 201;
     const HTTP_NO_CONTENT = 204;
     const HTTP_BAD_REQUEST = 400;
+<<<<<<< Updated upstream
     const HTTP_UNAUTHORIZED = 401;
+=======
+    const HTTP_UNAUTHORIZED=401;
+>>>>>>> Stashed changes
     const HTTP_FORBIDDEN = 403;
     const HTTP_NOT_FOUND = 404;
     const HTTP_I_AM_A_TEAPOT = 418;
