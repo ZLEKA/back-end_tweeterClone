@@ -24,12 +24,12 @@ class AuthController extends Controller
             if(empty($sanitaizer))
                 return Response::json(AuthController::NotWork,Response::HTTP_BAD_REQUEST); 
             
-            if(User::where('username','=',$sanitaizer['username'])->get())
-                return Response::json(AuthController::UserAlredyExist,Response::HTTP_BAD_REQUEST);
-                
             if(User::where('email','=',$sanitaizer['email'])->get())
                 return Response::json(AuthController::MailAlredyExist,Response::HTTP_BAD_REQUEST);
-                
+             
+            if(User::where('username','=',$sanitaizer['username'])->get())
+                return Response::json(AuthController::UserAlredyExist,Response::HTTP_BAD_REQUEST);
+                 
             $data=[
                 'username'=> $sanitaizer['username'],
                 'email'=> $sanitaizer['email'],
@@ -51,7 +51,6 @@ class AuthController extends Controller
                 return Response::json(AuthController::NotWork,Response::HTTP_BAD_REQUEST); 
             
             $userData=User::where('email','=',$sanitaizer['email'])->get();
-            
             if(empty($userData))
                 return Response::json(AuthController::NotWork,Response::HTTP_BAD_REQUEST);
             
@@ -91,6 +90,4 @@ class AuthController extends Controller
         }        
         return empty($param)?$sanitaizer:null;
     }
-
-
 }    

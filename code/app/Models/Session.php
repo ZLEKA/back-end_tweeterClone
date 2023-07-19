@@ -13,14 +13,12 @@ class Session extends Model{
     static function getSession(){
         session_start();
         if(!isset($_SESSION['user_log_id']))
-            return Response::json(AuthController::NotLogged,Response::HTTP_UNAUTHORIZED);
+            return null;
         session_regenerate_id();    
         $data=[
             'user_id' => $_SESSION['user_log_id'],
             'session_data'=> session_id()
         ];
-            
-        
         Session::newSession($data);
         $session=Session::find('user_id',$_SESSION['user_log_id']);
         Session::updateTime($session[0]->id);

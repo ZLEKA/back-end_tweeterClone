@@ -8,14 +8,11 @@ class TweetController extends Controller{
     public function createTweet(Request $request){
         try{
             $session=Session::getSession();
-            
             if(empty($session))
                 return Response::json(AuthController::NotLogged,Response::HTTP_UNAUTHORIZED);
             
-            $param=array("user_id","content");
-            
+            $param=array("content");
             $sanitaizer=AuthController::contolData($request,$param);
-            var_dump($sanitaizer);
             if(empty($sanitaizer))
                 return Response::json(AuthController::NotWork,Response::HTTP_BAD_REQUEST); 
             
@@ -23,7 +20,6 @@ class TweetController extends Controller{
                 'content'=> $sanitaizer['content'],
                 'user_id'=> $session[0]->user_id,
             ];
-            
             Tweet::create($data);
         }catch(Exception $e){
             return $this->jsonResponse([$e], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -56,9 +52,8 @@ class TweetController extends Controller{
     public function deleteTweet(Request $request,$id){
         try{
             $session=Session::getSession();
-            
-            if($session instanceof Response)
-                return $session;
+            if(empty($session))
+                return Response::json(AuthController::NotLogged,Response::HTTP_UNAUTHORIZED);
             
             $id=stripcslashes(trim($id));
             if(!isset($id) || $id=='')
@@ -83,7 +78,6 @@ class TweetController extends Controller{
             if(!isset($session))
                 return Response::json(AuthController::NotLogged,Response::HTTP_UNAUTHORIZED);
                 
-            
             $param=array("tweet_id","content");
             $sanitaizer=AuthController::contolData($request,$param);
             if(empty($sanitaizer))
@@ -93,12 +87,10 @@ class TweetController extends Controller{
             if(empty($tweet))
                 return  Response::json(AuthController::NotWork,Response::HTTP_BAD_REQUEST);
             
-            
             if($session[0]->user_id!=$tweet[0]->user_id)
                 return Response::json(['message'=>'you can\'t modify this tweet '],Response::HTTP_BAD_REQUEST);
                 
             Tweet::updateTweet($sanitaizer['tweet_id'],$sanitaizer['content']);
-            
         }catch(Exception $e){
             return $this->jsonResponse([$e], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
