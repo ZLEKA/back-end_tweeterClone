@@ -12,7 +12,7 @@ class Tweet extends Model{
     static function updateTweet($id,$content){
         //$tweet=Tweet::getTweet($id);
         $tweet=Tweet::find('id',$id);
-        //var_dump($tweet);
+        var_dump($tweet);
         if($tweet==null)
             return null;
         

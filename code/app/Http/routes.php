@@ -1,12 +1,16 @@
 <?php
 
 Router::get('/',['use'=>'HomeController@home']);
-Router::get('/auth',['use'=> 'AuthController@home']);
-Router::post('/auth/register',['use'=> 'AuthController@register']);
-Router::post('/auth/login',['use'=> 'AuthController@login']);
-Router::post('/auth/logout', ['use'=> 'AuthController@logout']);
-Router::post('/tweet',['use'=> 'TweetController@createTweet']);
-Router::post('/tweet/comment',['use'=> 'TweetController@commentTweet' ]);
-Router::delete('/tweet/delete/{id}', ['use'=>"TweetController@deleteTweet"]);
-Router::post('/tweet/update', ['use'=> 'TweetController@updateTweet']);
+Router::get('/auth/registerView',['use'=> 'AuthController@registerView']);
+Router::get('/auth/loginView', ['use'=>'AuthController@loginView'] );
+Router::get('/tweet/dashboard',['use'=> 'TweetController@dashboardView']);
+//-----------------------APIs--------------------------//
+Router::post('/api/auth/register',['use'=> 'AuthController@register']);
+Router::post('/api/auth/login',['use'=> 'AuthController@login']);
+Router::post('/api/auth/logout', ['use'=> 'AuthController@logout']);
+Router::post('/api/tweet',['use'=> 'TweetController@createTweet']);
+Router::post('/api/tweet/comment',['use'=> 'TweetController@commentTweet' ]);
+Router::delete('/api/tweet/delete/{id}', ['use'=>"TweetController@deleteTweet"]);
+Router::post('/api/tweet/update/{id}', ['use'=> 'TweetController@updateTweet']);
+
 

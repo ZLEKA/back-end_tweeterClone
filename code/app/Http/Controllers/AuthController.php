@@ -3,19 +3,23 @@ require_once( __DIR__. '/../../Models/User.php');
 require_once( __DIR__. '/../../Models/Session.php');
 require_once( __DIR__. '/../../Models/Tweet.php');
 require_once( __DIR__. '/../../Models/TweetComment.php');
+//require_once( __DIR__. '/../../Views/MyPages/register.php');
 class AuthController extends Controller
 {
-    public const NotLogged=['message'=>"not logged"];
-    public const NotWork=['message'=>'something go wrong'];
+    public const NotLogged=['message'=>"Not logged"];
+    public const NotWork=['message'=>'Something go wrong'];
     public const UserAlredyExist=['message'=>"User already exist"];
-    public const UnauthorizedUpdate=['message'=>'you can\'t delete this tweet'];
-    public const TweetNotExist=['message'=>'tweet not exist'];
+    public const UnauthorizedUpdate=['message'=>'You can\'t delete this tweet'];
+    public const TweetNotExist=['message'=>'Tweet not exist'];
     public const MailAlredyExist=['message'=>"Mail already exist"];
-    public const TweetNotFound = ['message'=>"no tweet found"];
-    public function home(Request $request){
-        return new View('auth.php',);
+    public const TweetNotFound = ['message'=>"No tweet found"];
+    public const PWNotEqual =['message' => "Password are different"];
+    public function registerView(Request $request){
+        return new View('register.php');
     }
-
+    public function loginView(){
+        return new View('login.php');
+    }
     public function register(Request $request){
         try{
             $param=array("username","email","password","confirm_password");
@@ -29,7 +33,10 @@ class AuthController extends Controller
              
             if(User::where('username','=',$sanitaizer['username'])->get())
                 return Response::json(AuthController::UserAlredyExist,Response::HTTP_BAD_REQUEST);
-                 
+            
+            if($sanitaizer['password']!= $sanitaizer['confirm_password'])
+                return Response::json(AuthController::PWNotEqual,Response::HTTP_BAD_REQUEST);
+
             $data=[
                 'username'=> $sanitaizer['username'],
                 'email'=> $sanitaizer['email'],
@@ -45,6 +52,7 @@ class AuthController extends Controller
     public function login(Request $request){
         session_start();
         try{
+            
             $param=["email", "password"];
             $sanitaizer=AuthController::contolData($request,$param);
             if(empty($sanitaizer))
@@ -82,6 +90,7 @@ class AuthController extends Controller
         $req =$rawData->request;
         //cleaning data
         $sanitaizer=$req->all();
+        //var_dump($sanitaizer);
         foreach($sanitaizer as $key=>$value) {
             $sanitaizer[$key]=stripcslashes(trim($value));
             $param=array_diff($param,array($key));
