@@ -1,6 +1,8 @@
 <?php
 require_once( __DIR__. '/../../libs/Model/Model.php');
 class Session extends Model{
+
+
     //data contains user_id & session_id
     static function newSession($data){
         if($session=Session::find('user_id',$data['user_id'])){   
@@ -10,8 +12,11 @@ class Session extends Model{
             Session::create($data);
         }
     }
+    
     static function getSession(){
-        session_start();
+        //check sessio if is active 
+        if(session_status()!=PHP_SESSION_ACTIVE)
+            session_start();
         if(!isset($_SESSION['user_log_id']))
             return null;
         session_regenerate_id();    
@@ -32,5 +37,8 @@ class Session extends Model{
             return true;
         }
         return false;
+    }
+    public function user(){
+        return $this->hasOne('User');
     }
 }

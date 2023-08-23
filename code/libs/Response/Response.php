@@ -1,4 +1,7 @@
 <?php
+header("Access-Control-Allow-Origin: http://localhost:9001");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: POST,DELETE");
 class Response
 {
     const HTTP_OK = 200;

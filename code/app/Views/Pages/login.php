@@ -2,10 +2,12 @@
 <html>
 <head>
   <title>Form di login</title>
+  <link rel="stylesheet" type="text/css" href="/../../../public/css/style.css">
+  <script src="/../../../public/js/script.js"></script>
 </head>
 <body>
   <h2>Accedi</h2>
-  <form id="loginForm" onsubmit="return validateForm()" method="post" >
+  <form id="loginForm"  method="post" >
     <label for="email">Email:</label>
     <input type="text" id="email" name="email" required>
     <br>
@@ -13,37 +15,32 @@
     <input type="password" id="password" name="password" required>
     <br>
     
-    <input type="submit" value="Accedi">
+    <input id='login' class='custom-btn  btn-3' type="submit" value="Accedi">
+    <input id='register' class='custom-btn  btn-3' type="submit" value="Registrati">
   </form>
 </body>
 </html>
 <script>
-    
-    async function sendDataToServer(formData) {
-      try {
-        const url = 'http://127.0.0.1/api/auth/login'; 
-        const response = await fetch(url, {
-          method: 'POST',
-          body: formData,
-        });
-        if (!response.ok){
-          window.location.assign("http://127.0.0.1/auth/registerView");
-        }else{
-          window.location.assign("http://127.0.0.1/tweet/dashboard");
-        }
-        // Aggiungi qui le operazioni da fare con la risposta del server
+const loginButton = document.getElementById('login');
+loginButton.addEventListener('click', async function(event) {
+  validateForm();
+});
+const registerButton = document.getElementById('register');
+registerButton.addEventListener('click', function(event){
+  window.location="http://127.0.0.1/auth/registerView";
+});
 
-      } catch (error) {
-        console.log('Errore:', error);
-        
-      }
-    }
-
-    async function validateForm(){
+const validateForm = async()=>{
         event.preventDefault();
         const form = document.getElementById('loginForm');
         const formData = new FormData(form);
-        await sendDataToServer( formData );
+        console.log(formData);
+        const response = await sendDataToServer( formData ,'http://127.0.0.1/api/auth/login');
+        if(response.ok) 
+          window.location="http://127.0.0.1/tweet/dashboard";
+        
+        alert("Something go wrong ");
+        
     }
     
 </script>

@@ -3,7 +3,10 @@
 const PHP = '.php';
 const ERROR_CONTROLLER_NOT_FOUND    = 'Controller does not exists';
 const ERROR_METHOD_NOT_PUBLIC       = 'Method is not public';
+header("Access-Control-Allow-Origin: *");
+header('Access-Control-Allow-Methods: GET, POST, UPDATE, DELETE');
 
+header("Access-Control-Allow-Headers: X-Requested-With");
 class Controller
 {
     /**

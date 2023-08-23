@@ -42,7 +42,7 @@ class AuthController extends Controller
                 'email'=> $sanitaizer['email'],
                 'password'=> md5($sanitaizer['password'])
             ];
-            User::create($data); 
+            return Response::json(User::create($data)); 
             
         }catch(Exception $e){
             return $this->jsonResponse([$e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -50,9 +50,8 @@ class AuthController extends Controller
     }
 
     public function login(Request $request){
-        session_start();
+        session_start(["cookie_httponly" => 1, "cookie_path" => "/","cookie_samesite"=>'None',"cookie_secure"=>1]);
         try{
-            
             $param=["email", "password"];
             $sanitaizer=AuthController::contolData($request,$param);
             if(empty($sanitaizer))
@@ -70,7 +69,7 @@ class AuthController extends Controller
                 'session_data'=>session_id(),
             ];
             $_SESSION['user_log_id']=$data['user_id'];
-            Session::newSession($data);
+            return Response::json(Session::newSession($data));
         }catch(Exception $e){
             return $this->jsonResponse([$e], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -100,3 +99,5 @@ class AuthController extends Controller
         return empty($param)?$sanitaizer:null;
     }
 }    
+
+
